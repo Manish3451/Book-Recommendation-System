@@ -137,22 +137,24 @@ streamlit run streamlit_app.py --server.port 8501
 
 UI available at: http://localhost:8501
 
-📂 Project Structure
+## 📂 Project Structure
+```plaintext
 Book-Recommendation-System/
 ├── app/
-│   └── api.py                 # FastAPI backend
+│   └── api.py                  # FastAPI backend (API endpoints)
 ├── data/
-│   ├── books.csv              # Dataset of books
-│   └── books_w2v.pkl          # Word2Vec embeddings & model
+│   ├── books.csv               # Raw dataset of books
+│   └── books_w2v.pkl           # Pre-trained Word2Vec embeddings (artifact)
 ├── scripts/
-│   └── build_tfidf_and_save.py # Script to train and save embeddings
-├── streamlit_app.py           # Streamlit frontend
-├── requirements.txt           # Dependencies
-├── Dockerfile.api             # FastAPI container build
-├── Dockerfile.ui              # Streamlit container build
-├── render.yaml                # Render deployment config
-├── .gitignore
-└── README.md
+│   └── build_tfidf_and_save.py # Script to train Word2Vec and save embeddings
+├── streamlit_app.py            # Streamlit frontend (UI)
+├── requirements.txt            # Python dependencies
+├── Dockerfile.api              # Dockerfile for FastAPI service
+├── Dockerfile.ui               # Dockerfile for Streamlit service
+├── render.yaml                 # Render deployment config (multi-service)
+├── .gitignore                  # Ignore venv, data, logs, etc.
+└── README.md                   # Project documentation
+```
 
 🤝 Contributing
 
@@ -172,4 +174,5 @@ Open a Pull Request
 
 This project is licensed under the MIT License — see the LICENSE
  file for details.
+
 
