@@ -55,7 +55,7 @@ flowchart TB
   CS --> A
   A --> S
   S --> U
-
+```
 Layers:
 
 Frontend Layer (Streamlit Web App)
@@ -172,3 +172,4 @@ Open a Pull Request
 
 This project is licensed under the MIT License — see the LICENSE
  file for details.
+
