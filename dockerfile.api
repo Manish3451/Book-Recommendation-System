@@ -1,62 +1,71 @@
 # syntax=docker/dockerfile:1
 
-# 1) Build stage: install python packages (this keeps final image smaller)
+# ---------- builder stage ----------
 FROM python:3.11-slim-bookworm AS builder
 
 WORKDIR /app
 
-# Avoid interactive prompts, update & upgrade to pick latest security patches,
-# install build deps required for wheels (if any).
-RUN apt-get update && \
-    apt-get upgrade -y && \
+# update, upgrade, install build deps (including Fortran + BLAS/LAPACK)
+RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
       build-essential \
       gcc \
+      gfortran \
+      python3-dev \
+      libblas-dev \
+      liblapack-dev \
+      libopenblas-dev \
+      libatlas-base-dev \
+      libssl-dev \
       libffi-dev \
       libxml2-dev \
       libxslt1-dev \
-      libssl-dev \
+      pkg-config \
       wget \
+      git \
+      ca-certificates \
+      rustc \
+      cargo \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy only requirements first to leverage Docker cache
+# copy only requirements first to leverage cache
 COPY requirements.txt .
 
-# Install into system site-packages in builder stage
-RUN pip install --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r requirements.txt
+# upgrade pip/setuptools/wheel (important)
+RUN python -m pip install --upgrade pip setuptools wheel meson ninja
 
-# Copy project files
+# install python deps (build from wheels where possible, compile where not)
+RUN pip install --no-cache-dir -r requirements.txt
+
+# copy project
 COPY . .
 
-# 2) Final stage: slim runtime image
+# ---------- final stage ----------
 FROM python:3.11-slim-bookworm
 
 WORKDIR /app
 
-# Create a non-root user
+# create non-root user
 RUN useradd --create-home --shell /bin/bash appuser
 
-# Update small runtime deps and clean apt lists; keep it minimal.
+# runtime deps (keep minimal)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      libffi7 \
-      libssl3 \
+      libopenblas3 \
+      libblas3 \
+      liblapack3 \
+      ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy installed packages from builder
+# copy installed packages & app from builder
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Copy app code (but not heavy build artifacts)
 COPY --from=builder /app /app
 
-# Make sure logs are not written to root-only places
 RUN chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8000
 
-# Use a simple healthcheck (optional)
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://127.0.0.1:8000/health || exit 1
 
-CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvic]()
