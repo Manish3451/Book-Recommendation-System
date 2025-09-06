@@ -5,15 +5,6 @@ It provides a **FastAPI backend** and a **Streamlit frontend**, both containeriz
 
 ---
 
-## ✨ Features
-- Train a **Word2Vec** model on book descriptions
-- Save/load precomputed embeddings (`books_w2v.pkl`)
-- Expose a **REST API** (`/recommend`) with FastAPI
-- Interactive **Streamlit UI**
-- Deployed with **Docker** on Render
-
----
-
 ## 🏗️ System Architecture
 
 ```mermaid
@@ -49,3 +40,13 @@ Book-Recommendation-System/
 ├── render.yaml                # Render deployment blueprint
 ├── .gitignore
 └── README.md
+
+---
+
+✅ With this change:
+- The **architecture diagram** will render correctly (Mermaid).  
+- The **folder structure** will show as plain code block (no Mermaid parsing).  
+
+---
+
+Do you also want me to add a **sequence diagram** (Mermaid) for the full request flow (User → Streamlit → FastAPI → Model → Response) in the README? That way you’ll have both an **architecture diagram** and a **flow diagram**.
