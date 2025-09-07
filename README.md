@@ -89,7 +89,16 @@ Visit → [http://localhost:8501](https://www.google.com/url?sa=E&q=http://local
 3.  **Select number of recommendations** → click Get Recommendations
     
 4.  **View results**: title, author, genre, similarity score in a table + list view
-    
+
+📸 Architecture Diagrams
+------------------------
+
+### System Architecture
+![System Architecture](app/static/images/system-architecture.png)
+
+### Model Architecture
+![Model Architecture](app/static/images/model-architecture.png)
+
 
 📂 Project Structure
 --------------------
