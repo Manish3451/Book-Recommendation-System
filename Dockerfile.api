@@ -1,11 +1,14 @@
 # Dockerfile.api
 # syntax=docker/dockerfile:1
 
-# ---------- builder stage ----------
+########################
+# Builder stage
+########################
 FROM python:3.11-slim-bookworm AS builder
 WORKDIR /app
 
-# Build deps (Fortran, BLAS/LAPACK, compilers) for packages like scipy
+# non-interactive apt (avoid tzdata prompts) and build deps for SciPy if compilation required
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
       build-essential gcc gfortran python3-dev \
@@ -14,32 +17,36 @@ RUN apt-get update && apt-get upgrade -y && \
       rustc cargo \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install (upgrade pip/tooling first)
+# copy requirements and install
 COPY requirements.txt .
 RUN python -m pip install --upgrade pip setuptools wheel meson ninja
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app code
+# copy app code
 COPY . .
 
-# ---------- final stage (runtime) ----------
+########################
+# Final runtime stage
+########################
 FROM python:3.11-slim-bookworm
 WORKDIR /app
 
-# make non-root user
+ENV DEBIAN_FRONTEND=noninteractive
+
+# create non-root user
 RUN useradd --create-home --shell /bin/bash appuser
 
-# minimal runtime libs
+# install minimal runtime libs (use libatlas3-base for portable BLAS/LAPACK)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      libopenblas3 ca-certificates curl \
+      libatlas3-base ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
 
-# copy installed packages + app
+# copy installed python packages and app code from builder
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /app /app
 
-# set permissions and use non-root
+# permissions and user
 RUN chown -R appuser:appuser /app
 USER appuser
 
@@ -47,5 +54,4 @@ EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://127.0.0.1:8000/health || exit 1
 
-# start uvicorn
 CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
