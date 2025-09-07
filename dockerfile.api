@@ -1,66 +1,45 @@
+# Dockerfile.api
 # syntax=docker/dockerfile:1
 
 # ---------- builder stage ----------
 FROM python:3.11-slim-bookworm AS builder
-
 WORKDIR /app
 
-# update, upgrade, install build deps (including Fortran + BLAS/LAPACK)
+# Build deps (Fortran, BLAS/LAPACK, compilers) for packages like scipy
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-      build-essential \
-      gcc \
-      gfortran \
-      python3-dev \
-      libblas-dev \
-      liblapack-dev \
-      libopenblas-dev \
-      libatlas-base-dev \
-      libssl-dev \
-      libffi-dev \
-      libxml2-dev \
-      libxslt1-dev \
-      pkg-config \
-      wget \
-      git \
-      ca-certificates \
-      rustc \
-      cargo \
+      build-essential gcc gfortran python3-dev \
+      libopenblas-dev liblapack-dev libblas-dev pkg-config \
+      wget git ca-certificates curl \
+      rustc cargo \
     && rm -rf /var/lib/apt/lists/*
 
-# copy only requirements first to leverage cache
+# Copy requirements and install (upgrade pip/tooling first)
 COPY requirements.txt .
-
-# upgrade pip/setuptools/wheel (important)
 RUN python -m pip install --upgrade pip setuptools wheel meson ninja
-
-# install python deps (build from wheels where possible, compile where not)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copy project
+# Copy app code
 COPY . .
 
-# ---------- final stage ----------
+# ---------- final stage (runtime) ----------
 FROM python:3.11-slim-bookworm
-
 WORKDIR /app
 
-# create non-root user
+# make non-root user
 RUN useradd --create-home --shell /bin/bash appuser
 
-# runtime deps (keep minimal)
+# minimal runtime libs
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      libopenblas3 \
-      libblas3 \
-      liblapack3 \
-      ca-certificates \
+      libopenblas3 ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
 
-# copy installed packages & app from builder
+# copy installed packages + app
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /app /app
 
+# set permissions and use non-root
 RUN chown -R appuser:appuser /app
 USER appuser
 
@@ -68,4 +47,5 @@ EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://127.0.0.1:8000/health || exit 1
 
-CMD ["uvic]()
+# start uvicorn
+CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
