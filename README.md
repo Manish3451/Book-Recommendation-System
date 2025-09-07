@@ -1,141 +1,323 @@
+# Book Recommendation System
 
-🛠️ Technologies Used
----------------------
+> A full-stack Book Recommendation System powered by Word2Vec embeddings and cosine similarity. FastAPI backend, Streamlit frontend, Dockerized and ready for deployment.
 
-*   **Python 3.11**
-    
-*   **FastAPI** → backend API
-    
-*   **Streamlit** → frontend UI
-    
-*   **Gensim** → Word2Vec embeddings
-    
-*   **Scikit-learn** → cosine similarity
-    
-*   **Pandas / NumPy** → data handling
-    
-*   **Joblib** → model serialization
-    
-*   **Docker** → containerization
-    
-*   **Render** → cloud deployment
-    
+---
 
-⚙️ Setup (Local Development)
-----------------------------
+## Table of Contents
 
-### 1\. Clone the repo
+* [Overview](#overview)
+* [Features](#features)
+* [Technologies](#technologies)
+* [Getting Started](#getting-started)
 
-code Bashdownloadcontent\_copyexpand\_less
+  * [Prerequisites](#prerequisites)
+  * [Installation](#installation)
+  * [Run Locally (Development)](#run-locally-development)
+  * [Run with Docker](#run-with-docker)
+* [Usage](#usage)
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML    `git clone https://github.com/Manish3451/Book-Recommendation-System.git  cd Book-Recommendation-System`  
+  * [Web Interface](#web-interface)
+  * [API Usage](#api-usage)
+  * [Example Queries](#example-queries)
+* [API Documentation](#api-documentation)
 
-### 2\. Create virtual environment
+  * `POST /recommend`
+  * `GET /health`
+  * `GET /stats`
+* [Project Structure](#project-structure)
+* [Configuration](#configuration)
+* [Data](#data)
+* [Testing](#testing)
+* [Contributing](#contributing)
+* [License](#license)
 
-code Bashdownloadcontent\_copyexpand\_lessIGNORE\_WHEN\_COPYING\_STARTIGNORE\_WHEN\_COPYING\_END
+---
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML    `python -m venv .venv  source .venv/bin/activate   # Linux/Mac  .venv\Scripts\activate      # Windows`  
+## Overview
 
-### 3\. Install dependencies
+This project provides book recommendations using Word2Vec embeddings (to embed book descriptions) and cosine similarity (to find nearest neighbors). It exposes a FastAPI backend for recommendation queries and a Streamlit frontend for an interactive UI. The system is containerized with Docker and ready to deploy (e.g., Render, Heroku, or your preferred provider).
 
-code Bashdownloadcontent\_copyexpand\_lessIGNORE\_WHEN\_COPYING\_STARTIGNORE\_WHEN\_COPYING\_END
+## Features
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML    `pip install --upgrade pip setuptools wheel  pip install -r requirements.txt`  
+* Text-based recommendations from natural-language descriptions
+* Configurable number of recommendations (1–20)
+* FastAPI REST API with health and stats endpoints
+* Streamlit web UI for quick experimentation
+* Model serialization for fast startup
+* Dockerfile for easy containerization
 
-### 4\. Run backend (FastAPI)
+## Technologies
 
-code Bashdownloadcontent\_copyexpand\_lessIGNORE\_WHEN\_COPYING\_STARTIGNORE\_WHEN\_COPYING\_END
+* Python 3.11+
+* FastAPI (backend)
+* Uvicorn (ASGI server)
+* Streamlit (frontend)
+* Gensim (Word2Vec)
+* scikit-learn (cosine similarity)
+* pandas / NumPy
+* joblib (model serialization)
+* Docker
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML    `uvicorn app.api:app --reload --host 0.0.0.0 --port 8000`  
+## Getting Started
 
-Visit → [http://localhost:8000/docs](https://www.google.com/url?sa=E&q=http://localhost:8000/docs)
+### Prerequisites
 
-### 5\. Run frontend (Streamlit)
+* Python 3.11 or later
+* pip (or pipx)
+* Docker (optional, for containerized runs)
 
-code Bashdownloadcontent\_copyexpand\_lessIGNORE\_WHEN\_COPYING\_STARTIGNORE\_WHEN\_COPYING\_END
+### Installation
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML    `streamlit run app/streamlit_app.py --server.port=8501`  
+```bash
+# clone the repo
+git clone https://github.com/Manish3451/Book-Recommendation-System.git
+cd Book-Recommendation-System
 
-Visit → [http://localhost:8501](https://www.google.com/url?sa=E&q=http://localhost:8501)
+# create venv and activate
+python -m venv .venv
+# Windows
+# .venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
 
-🚀 Deployment on Render
------------------------
+# install dependencies
+pip install -r requirements.txt
+```
 
-### Backend (API)
+### Run Locally (Development)
 
-*   Dockerfile: Dockerfile.api
-    
-*   code Bashdownloadcontent\_copyexpand\_lessIGNORE\_WHEN\_COPYING\_STARTIGNORE\_WHEN\_COPYING\_END uvicorn app.api:app --host 0.0.0.0 --port 8000
-    
-*   code Codedownloadcontent\_copyexpand\_lessIGNORE\_WHEN\_COPYING\_STARTIGNORE\_WHEN\_COPYING\_END MODEL\_URL=https://github.com/Manish3451/Book-Recommendation-System/releases/download/v1.0-model/books\_w2v.pkl
-    
+Run backend (FastAPI + Uvicorn):
 
-### Frontend (UI)
+```bash
+# from project root
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-*   Dockerfile: Dockerfile.ui
-    
-*   code Bashdownloadcontent\_copyexpand\_lessIGNORE\_WHEN\_COPYING\_STARTIGNORE\_WHEN\_COPYING\_END streamlit run app/streamlit\_app.py --server.port=8501 --server.address=0.0.0.0
-    
+Run Streamlit frontend (default port 8501):
 
-✅ Both services are deployed separately on Render and communicate via the API URL (set in UI).
+```bash
+streamlit run app/frontend.py --server.port 8501
+```
 
-🧑‍💻 Usage
------------
+Open the Streamlit app at: `http://localhost:8501`
 
-1.  **Enter a description** (e.g., “A young wizard battles dark forces”)
-    
-2.  Or **choose a seed index** (row number from dataset)
-    
-3.  **Select number of recommendations** → click Get Recommendations
-    
-4.  **View results**: title, author, genre, similarity score in a table + list view
+> If you prefer to run both with a single command, consider using `tmux`, `make`, or a small shell script.
 
-📸 Architecture Diagrams
-------------------------
+### Run with Docker
 
-### System Architecture
+Build the image and run containers (example):
+
+```bash
+# build image
+docker build -t book-recs:latest .
+
+# run container (exposes 8000)
+docker run -p 8000:8000 book-recs:latest
+```
+
+If using docker-compose a `docker-compose.yml` may run both backend and frontend on their respective ports.
+
+---
+
+# 📸 Architecture Diagrams ------------------------ 
+### System Architecture 
 ![System Architecture](app/static/images/system-architecture.png)
 
-### Model Architecture
+### Model Architecture 
 ![Model Architecture](app/static/images/model-architecture.png)
 
+## Usage
 
-📂 Project Structure
---------------------
 
-code Codedownloadcontent\_copyexpand\_lessIGNORE\_WHEN\_COPYING\_STARTIGNORE\_WHEN\_COPYING\_END
+Open the Streamlit app at `http://localhost:8501`.
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML    `Book-Recommendation-System/  ├── app/  │   ├── api.py              # FastAPI backend  │   └── streamlit_app.py    # Streamlit frontend  ├── scripts/  │   └── build_tfidf_and_save.py  # Preprocessing & model building helpers  ├── data/  │   ├── books.csv           # Raw dataset  │   └── books_w2v.pkl       # Word2Vec model (downloaded at runtime)  ├── Dockerfile.api          # Backend container  ├── Dockerfile.ui           # Frontend container  ├── requirements.txt        # Python dependencies  ├── README.md               # Project documentation  └── .gitignore              # Git ignored files`  
+Choose your input method:
 
-🤝 Contributing
----------------
+* Enter a book description in the text area
+* Or select a book index from the dataset
 
-Contributions welcome!
+Then:
 
-1.  Fork repo
-    
-2.  Create feature branch → git checkout -b feature/my-feature
-    
-3.  Commit changes → git commit -m "Add my feature"
-    
-4.  Push branch → git push origin feature/my-feature
-    
-5.  Open Pull Request
-    
+1. Set number of recommendations (1–20)
+2. Click **Get Recommendations**
+3. View results in table and list format
 
-📜 License
-----------
+### API Usage
 
-This project is licensed under the MIT License. See the [LICENSE](https://www.google.com/url?sa=E&q=LICENSE) file for details.
+**Python example**
 
-📬 Contact
-----------
+```python
+import requests
 
-Manish Mandal
+# Get recommendations by description
+response = requests.post("http://localhost:8000/recommend", json={
+    "description": "A young wizard battles dark forces",
+    "num_recommendations": 5
+})
 
-*   **GitHub**: [Manish3451](https://www.google.com/url?sa=E&q=https://github.com/Manish3451)
-    
-*   **LinkedIn**: \[Your LinkedIn Profile Link\]
-    
-*   **Email**: \[Your Email Address\]
+recommendations = response.json()
+print(recommendations)
+```
 
+### Example Queries
+
+Try these sample descriptions:
+
+* "A detective solving mysterious crimes in Victorian London"
+* "Space exploration and alien civilizations"
+* "Romance novel set in medieval times"
+* "Coming of age story about friendship"
+
+---
+
+## API Documentation
+
+### `POST /recommend`
+
+Get book recommendations based on description.
+
+**Request Body (JSON)**
+
+```json
+{
+  "description": "string",
+  "num_recommendations": 5
+}
+```
+
+**Response (JSON)**
+
+```json
+{
+  "recommendations": [
+    {
+      "title": "Book Title",
+      "author": "Author Name",
+      "genre": "Genre",
+      "similarity_score": 0.95,
+      "description": "Book description..."
+    }
+  ],
+  "query": "original query",
+  "total_found": 5
+}
+```
+
+### `GET /health`
+
+Health check endpoint.
+
+**Response**
+
+```json
+{ "status": "healthy" }
+```
+
+### `GET /stats`
+
+Get system statistics.
+
+**Response**
+
+```json
+{
+  "total_books": 1000,
+  "uptime": "2h 30m",
+  "requests_served": 150
+}
+```
+
+---
+
+## Project Structure
+
+A suggested project layout — adapt to your repo:
+
+```
+book-recommendation-system/
+├── app/
+│   ├── main.py            # FastAPI app entrypoint
+│   ├── api.py             # route definitions
+│   ├── model.py           # model loading & inference helpers
+│   ├── utils.py           # utility functions
+│   ├── frontend.py        # Streamlit front-end (if inside same repo)
+│   └── data/
+│       ├── books.csv
+│       └── embeddings.joblib
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── README.md
+└── tests/
+    └── test_api.py
+```
+
+---
+
+## Configuration
+
+Use environment variables for configurable parameters (example):
+
+* `PORT` — backend port (default: `8000`)
+* `MODEL_PATH` — path to serialized embeddings or model
+* `DATA_PATH` — path to dataset (CSV)
+
+Example `.env` file:
+
+```env
+PORT=8000
+MODEL_PATH=app/data/embeddings.joblib
+DATA_PATH=app/data/books.csv
+```
+
+---
+
+## Data
+
+* `books.csv` should contain at minimum: `title, author, genre, description`.
+* Precompute embeddings for all descriptions and serialize them (e.g., with `joblib`) for fast lookup.
+
+Tips:
+
+* Keep a mapping `index -> book metadata` and a `NumPy` matrix of embeddings for similarity search.
+* Normalize and clean text before training Word2Vec (lowercase, remove punctuation, strip stopwords as appropriate).
+
+---
+
+## Testing
+
+Run unit tests with `pytest`:
+
+```bash
+pytest -q
+```
+
+Include tests for:
+
+* API response shapes
+* Similarity ranking sanity checks
+* Model loading and health checks
+
+---
+
+## Contributing
+
+Contributions welcome! Please open an issue or pull request with a clear description of changes.
+
+Suggested workflow:
+
+1. Fork the repo
+2. Create a feature branch `feat/your-feature`
+3. Commit and push
+4. Open a Pull Request with a description and tests
+
+---
+
+## License
+
+This project is provided under the MIT License. See the `LICENSE` file for details.
+
+---
+
+*Made with ❤️ — happy recommending!*
