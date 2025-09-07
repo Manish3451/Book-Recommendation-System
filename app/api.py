@@ -7,20 +7,53 @@ from pathlib import Path
 import joblib
 import logging
 import numpy as np
+import requests
+import os
 from sklearn.metrics.pairwise import cosine_similarity
 
 LOG = logging.getLogger("recommender_api")
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s - %(message)s")
 
-ARTIFACT_PATH = Path("data/books_w2v.pkl")
+# GitHub release URL for the model file
+MODEL_URL = "https://github.com/Manish3451/Book-Recommendation-System/releases/download/v1.0-model/books_w2v.pkl"
+LOCAL_MODEL_PATH = Path("books_w2v.pkl")
+
+def download_model_if_needed():
+    """Download model from GitHub release if not present locally"""
+    if LOCAL_MODEL_PATH.exists():
+        LOG.info("Model file already exists locally")
+        return LOCAL_MODEL_PATH
+    
+    LOG.info("Downloading model from GitHub release...")
+    try:
+        response = requests.get(MODEL_URL, stream=True)
+        response.raise_for_status()
+        
+        # Create directory if it doesn't exist
+        LOCAL_MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(LOCAL_MODEL_PATH, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        
+        LOG.info("Model downloaded successfully: %s", LOCAL_MODEL_PATH)
+        return LOCAL_MODEL_PATH
+        
+    except Exception as e:
+        LOG.error("Failed to download model: %s", e)
+        raise
+
+def load_artifact():
+    """Load the model artifact, downloading if necessary"""
+    try:
+        model_path = download_model_if_needed()
+        data = joblib.load(model_path)
+        return data["w2v_model"], data["vectors"], data["meta"]
+    except Exception as e:
+        LOG.error("Failed to load artifact: %s", e)
+        raise
 
 # Load artifact at startup
-def load_artifact(path: Path = ARTIFACT_PATH):
-    if not path.exists():
-        raise FileNotFoundError(f"Artifact not found at: {path}")
-    data = joblib.load(path)
-    return data["w2v_model"], data["vectors"], data["meta"]
-
 try:
     MODEL, VECTORS, META_DF = load_artifact()
     LOG.info("Loaded artifact successfully: %d rows", len(META_DF))
